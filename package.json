@@ -21,6 +21,7 @@
     "express": "^4.15.5",
     "faker": "^4.1.0",
     "fs-extra": "^4.0.3",
+    "jscs": "^3.0.7",
     "jsonwebtoken": "^8.1.0",
     "mongoose": "^4.11.13",
     "mongoose-paginate": "^5.0.3",
