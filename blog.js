@@ -18,6 +18,13 @@ mongoose.connect(config.db_url, {
     useMongoClient: true
 });
 
+// Configuring Passport
+var passport = require('passport');
+var expressSession = require('express-session');
+app.use(expressSession({secret: 'mySecretKey'}));
+app.use(passport.initialize());
+app.use(passport.session());
+
 //  middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -25,6 +32,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 global.asyncWrap = (fn, errorCallback) => {
     return (req, res, next) => {
         fn(req, res, next).catch(error => {
+            console.log(error);
             if (errorCallback){
                 errorCallback(req, res, error);
             } else {
@@ -93,14 +101,14 @@ let globalRepositories = async () => {
 }
 globalRepositories();
 
-// decode token 
+// decode token
 app.use('*', async (req, res, next) => {
     try {
         let token = req.headers['x-access-token'];
         if (!token) return next();
         let userId = await userService.jwtVerify(token);
         req.user = await user.findById(userId);
-        res.header('Access-Control-Allow-Origin', '*');       
+        res.header('Access-Control-Allow-Origin', '*');
         next();
     } catch (error) {
         // Error when decode token, and req.user will be null
