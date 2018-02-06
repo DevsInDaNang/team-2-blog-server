@@ -140,7 +140,7 @@ app.use('*', (req, res, next) => {
     next();
 });
 
-app.listen(config.port, function(err) {
+app.listen(process.env.PORT || config.port, function(err) {
     if (err) {
         console.log('Start server error');
     } else {
