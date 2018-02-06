@@ -9,4 +9,6 @@ module.exports = function (app, passport) {
     app.route('/user/me').get(userController.getProfileMe);
 
     app.route('/user/signup').post(authController.createUser(passport));
+
+    app.route('/user/login').post(authController.userLogin(passport));
 };
