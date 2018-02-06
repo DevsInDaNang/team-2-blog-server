@@ -3,6 +3,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+var passport = require('passport');
+var expressSession = require('express-session');
 let config = require('./config/development');
 const app = new express();
 const path = require("path");
@@ -19,9 +21,8 @@ mongoose.connect(config.db_url, {
 });
 
 // Configuring Passport
-var passport = require('passport');
-var expressSession = require('express-session');
-app.use(expressSession({secret: 'mySecretKey'}));
+require('./config/passport')(passport);
+app.use(expressSession({secret: 'justanormalsecretkeyforpassport'}));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -125,7 +126,7 @@ require('./api/policies/userPolicy')(app);
 require('./api/policies/adminPolicy')(app);
 
 //  api
-require('./api/routes/user')(app);
+require('./api/routes/user')(app, passport);
 
 // faker
 if (process.env.NODE_ENV !== 'production') {

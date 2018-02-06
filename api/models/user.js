@@ -1,6 +1,7 @@
 "use strict";
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate');
+const bcrypt   = require('bcrypt-nodejs');
 
 const UserSchema = new mongoose.Schema({
     email               : { type: String, min: 5, max: 255, unique: true, require: true },
@@ -19,18 +20,14 @@ const UserSchema = new mongoose.Schema({
 
 UserSchema.plugin(mongoosePaginate);
 
-// Before create new User, let hash user password
-UserSchema.pre('save', async function save (next) {
-    try {
-        const user = this;
-        // hash password
-        if (user.password)
-            user.password = await bcryptService.hash(user.password);
+// generating a hash
+UserSchema.methods.generateHash = function(password) {
+    return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+};
 
-        next();
-    } catch (error) {
-        next(error)
-    }
-});
+// checking if password is valid
+UserSchema.methods.validPassword = function(password) {
+    return bcrypt.compareSync(password, this.password);
+};
 
 module.exports = mongoose.model('User', UserSchema);
