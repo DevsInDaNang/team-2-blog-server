@@ -1,53 +1,34 @@
 'use strict';
 
+const userService = require('../services/userService');
+
 module.exports = {
-    createUser: function (passport) {
+    createUser: (passport) => {
         return asyncWrap(async(req, res) => {
-            passport.authenticate('local-signup', function (err, user) {
+            passport.authenticate('local-signup', (err, user) => {
                 if (err) {
-                    return res.json(returnedErrorData(err));
+                    return res.status(err.code).send(err.codeDesc);
                 }
                 if (user) {
-                    return res.json({
-                        error: false,
-                        code: 201,
-                        codeDesc: 'Created',
-                        message: 'User is signed up successfully.',
-                        data: {
-                            user: user
-                        }
-                    })
+                    return res.sendStatus(201);
                 }
             })(req, res);
         })
     },
 
-    userLogin: function (passport) {
+    userLogin: (passport) => {
         return asyncWrap(async(req, res) => {
-            passport.authenticate('local-login', function (err, user) {
+            passport.authenticate('local-login', (err, user) => {
                 if (err) {
-                    return res.json(returnedErrorData(err));
+                    return res.status(err.code).send(err.codeDesc);
                 }
                 if (user) {
-                    return res.json({
-                        error: false,
-                        code: 200,
-                        codeDesc: 'Ok',
-                        data: {
-                            user: user
-                        }
+                    return res.status(200).send({
+                        user: user,
+                        token: userService.generateUserToken(user)
                     })
                 }
             })(req, res);
         })
     }
 };
-
-function returnedErrorData(data) {
-    return {
-        error: true,
-        code: data.code,
-        codeDesc: data.codeDesc,
-        message: data.message
-    }
-}
